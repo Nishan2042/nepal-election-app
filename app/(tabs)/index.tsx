@@ -7,10 +7,24 @@ import { StatCard } from "@/components/StatCard";
 import { PartyBadge } from "@/components/PartyBadge";
 import { ELECTION_SUMMARY, PARTIES, formatVotes } from "@/constants/electionData";
 import { useColors } from "@/hooks/use-colors";
+import { useElectionDataSync } from "@/hooks/useElectionDataSync";
 
 export default function HomeScreen() {
   const router = useRouter();
   const colors = useColors();
+  const { lastSyncTime } = useElectionDataSync();
+
+  const formatSyncTime = (date: Date | null) => {
+    if (!date) return "Syncing...";
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins}m ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    return date.toLocaleDateString();
+  };
 
   const topParties = [...PARTIES]
     .filter((p) => p.id !== "ind")
@@ -26,7 +40,8 @@ export default function HomeScreen() {
             <Text style={styles.headerFlag}>🇳🇵</Text>
             <View>
               <Text style={styles.headerTitle}>Nepal Votes</Text>
-              <Text style={styles.headerSubtitle}>2022 General Election Results</Text>
+              <Text style={styles.headerSubtitle}>2082 General Election Results</Text>
+              <Text style={styles.headerUpdate}>Updated: {formatSyncTime(lastSyncTime)}</Text>
             </View>
           </View>
         </View>
@@ -45,6 +60,11 @@ export default function HomeScreen() {
               {ELECTION_SUMMARY.date}
             </Text>
           </Text>
+        </View>
+
+        {/* Auto-Sync Status */}
+        <View style={[styles.syncBanner, { backgroundColor: colors.primary + "15", borderColor: colors.primary + "40" }]}>
+          <Text style={[styles.syncText, { color: colors.primary }]}>🔄 Auto-syncing every hour from Election Commission</Text>
         </View>
 
         {/* Summary Stats */}
@@ -152,7 +172,7 @@ export default function HomeScreen() {
         </Pressable>
 
         {/* Top Parties Quick View */}
-        <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Top Parties by Seats</Text>
+        <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Top Parties by Seats (2082)</Text>
         <View style={[styles.topPartiesCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           {topParties.map((party, idx) => (
             <Pressable
@@ -186,7 +206,7 @@ export default function HomeScreen() {
         <View style={[styles.infoBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           <Text style={[styles.infoTitle, { color: colors.foreground }]}>Electoral System</Text>
           <Text style={[styles.infoText, { color: colors.muted }]}>
-            Nepal uses a mixed electoral system. <Text style={{ fontWeight: "600", color: colors.foreground }}>165 seats</Text> are elected via First-Past-The-Post (FPTP) from single-member constituencies. The remaining <Text style={{ fontWeight: "600", color: colors.foreground }}>110 seats</Text> are allocated through closed-list Proportional Representation (PR) using the Sainte-Laguë method. Parties must cross a <Text style={{ fontWeight: "600", color: "#D97706" }}>3% threshold</Text> to receive PR seats.
+            Nepal uses a mixed electoral system. <Text style={{ fontWeight: "600", color: colors.foreground }}>165 seats</Text> are elected via First-Past-The-Post (FPTP) from single-member constituencies. The remaining <Text style={{ fontWeight: "600", color: colors.foreground }}>110 seats</Text> are allocated through closed-list Proportional Representation (PR) using the Sainte-Laguë method. Parties must cross a <Text style={{ fontWeight: "600", color: "#D97706" }}>3% threshold</Text> to receive PR seats. This app automatically syncs the latest results every hour.
           </Text>
         </View>
 
@@ -225,6 +245,12 @@ const styles = StyleSheet.create({
     color: "rgba(255,255,255,0.8)",
     fontWeight: "500",
   },
+  headerUpdate: {
+    fontSize: 10,
+    color: "rgba(255,255,255,0.7)",
+    fontWeight: "400",
+    marginTop: 2,
+  },
   scrollContent: {
     padding: 16,
   },
@@ -237,6 +263,17 @@ const styles = StyleSheet.create({
   dateBannerText: {
     fontSize: 13,
     textAlign: "center",
+  },
+  syncBanner: {
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+  },
+  syncText: {
+    fontSize: 12,
+    textAlign: "center",
+    fontWeight: "500",
   },
   sectionTitle: {
     fontSize: 17,

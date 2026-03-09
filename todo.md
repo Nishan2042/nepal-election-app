@@ -36,3 +36,16 @@
 - [x] Haptic feedback on interactions (HapticTab)
 - [x] Loading states and empty states (empty state in constituency list)
 - [x] Search/filter functionality on constituency list
+
+
+## March 2026 (2082) Election Update
+- [x] Update election date to March 2026 (2082)
+- [x] Update PR vote data with official 2082 results
+- [x] Update FPTP seat distribution with 2082 results
+- [x] Update party list with new parties from 2082 election
+- [x] Update election summary stats (turnout, total votes, etc.)
+- [x] Create automated sync service (electionDataSync.ts)
+- [x] Create useElectionDataSync hook
+- [x] Update home screen with sync status and last update time
+- [x] Test all screens with new data
+- [x] Save updated checkpoint
